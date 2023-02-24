@@ -11,31 +11,26 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import { observer } from 'mobx-react-lite';
 
-import { useExchangeRate, useGlobalContext } from 'hooks';
+import { useExchangeRate } from 'hooks';
+import { useExchangeListStore } from 'shared/context';
 import { getFormattedDate } from 'shared/utils/date.utils';
 
 import EmptyList from './EmptyList';
 import ExchangeListRow from './ExchangeListRow';
 
-const ExchangeList: React.FC = () => {
-  const {
-    currecyListFormValues: { baseCurrency, currenciesList },
-    currenciesOptions,
-  } = useGlobalContext();
+const ExchangeList: React.FC = observer(() => {
+  const { activeCurrenciesList, baseCurrency } = useExchangeListStore();
 
   const { lastUpdatedAt, currentExchangeInfo } = useExchangeRate({
     baseCurrency: baseCurrency?.code,
   });
 
-  const activeCurrenciesOptions = currenciesOptions.filter((cur) =>
-    currenciesList.some((c) => c.code === cur.code),
-  );
-
   const rows = React.useMemo(
     () =>
       currentExchangeInfo
-        ? activeCurrenciesOptions.map((c) => {
+        ? activeCurrenciesList.map((c) => {
             const exchangeInfo = currentExchangeInfo.find(
               (exchangeInfo) => exchangeInfo.code === c.code,
             );
@@ -43,7 +38,7 @@ const ExchangeList: React.FC = () => {
             return { ...c, ...exchangeInfo };
           })
         : [],
-    [activeCurrenciesOptions, currentExchangeInfo],
+    [activeCurrenciesList, currentExchangeInfo],
   );
 
   const updatedAt = getFormattedDate(lastUpdatedAt);
@@ -80,6 +75,6 @@ const ExchangeList: React.FC = () => {
       </Table>
     </TableContainer>
   );
-};
+});
 
 export default ExchangeList;

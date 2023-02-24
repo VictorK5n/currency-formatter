@@ -1,1 +1,8 @@
-export { GlobalContext, GlobalContextProvider } from './global.context';
+export {
+  RootStoreContext,
+  RootStoreContextProvider,
+  useConvertStore,
+  useCurrenciesStore,
+  useExchangeListStore,
+  useRootStore,
+} from './store/rootStoreContext';

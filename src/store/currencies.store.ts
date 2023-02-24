@@ -12,7 +12,7 @@ export class CurrenciesStore {
 
     makeObservable(this, {
       currenciesList: observable,
-      setCurrenciesList: action,
+      setCurrenciesList: action.bound,
     });
   }
 

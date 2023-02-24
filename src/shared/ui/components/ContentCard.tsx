@@ -11,20 +11,22 @@ interface ContentCardProps {
   content: React.ReactNode;
 }
 
-const ContentCard: React.FC<ContentCardProps> = React.memo(
-  ({ content, title, headerIcon }) => (
-    <Card>
-      <CardContent>
-        <HeaderWrapper>
-          {headerIcon}
-          <Title variant="h6" fontWeight={500}>
-            {title}
-          </Title>
-        </HeaderWrapper>
-        <ContentWrapper>{content}</ContentWrapper>
-      </CardContent>
-    </Card>
-  ),
+const ContentCard: React.FC<ContentCardProps> = ({
+  content,
+  title,
+  headerIcon,
+}) => (
+  <Card>
+    <CardContent>
+      <HeaderWrapper>
+        {headerIcon}
+        <Title variant="h6" fontWeight={500}>
+          {title}
+        </Title>
+      </HeaderWrapper>
+      <ContentWrapper>{content}</ContentWrapper>
+    </CardContent>
+  </Card>
 );
 
 const HeaderWrapper = styled.div`

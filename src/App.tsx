@@ -10,8 +10,7 @@ import { ThemeProvider } from 'styled-components';
 
 import router from 'routes';
 import { queryClient } from 'services';
-import { GlobalContextProvider } from 'shared/context';
-import { CurrenciesContextProvider } from 'shared/context/currenciesContext';
+import { RootStoreContextProvider } from 'shared/context/store/rootStoreContext';
 import { GlobalStyle, styledComponentsScheme } from 'styles/theme';
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -24,11 +23,9 @@ const App: React.FC = () => (
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={styledComponentsScheme}>
           <GlobalStyle />
-          <GlobalContextProvider>
-            <CurrenciesContextProvider>
-              <RouterProvider router={router} />
-            </CurrenciesContextProvider>
-          </GlobalContextProvider>
+          <RootStoreContextProvider>
+            <RouterProvider router={router} />
+          </RootStoreContextProvider>
         </ThemeProvider>
       </StyledEngineProvider>
     </QueryClientProvider>

@@ -11,26 +11,28 @@ import {
   IconButton,
   TextField,
 } from '@mui/material';
+import { observer } from 'mobx-react-lite';
 import { down } from 'styled-breakpoints';
 import styled from 'styled-components';
 
 import { useExchangeRate } from 'hooks';
-import { useGlobalContext } from 'hooks/global/useGlobalContext';
 import { CurrencyType } from 'shared/api';
+import { useConvertStore, useCurrenciesStore } from 'shared/context';
 import { metrics } from 'styles/theme';
 
 export type ConvertFormValues = {
   amount: number;
-  fromCurrency: CurrencyType;
-  toCurrency: CurrencyType;
+  fromCurrency?: CurrencyType;
+  toCurrency?: CurrencyType;
 };
 
-const ConvertForm: React.FC = () => {
+const ConvertForm: React.FC = observer(() => {
   const {
-    convertFormValues: { amount, fromCurrency, toCurrency },
-    currenciesOptions,
-    setConvertFormValues,
-  } = useGlobalContext();
+    convertValues: { amount, fromCurrency, toCurrency },
+    setConvertValues,
+  } = useConvertStore();
+
+  const { currenciesList } = useCurrenciesStore();
 
   const { triggerExchangeRate, isExchageRateLoading, currentExchangeInfo } =
     useExchangeRate({
@@ -49,8 +51,8 @@ const ConvertForm: React.FC = () => {
   } = useForm<ConvertFormValues>({
     defaultValues: {
       amount,
-      fromCurrency,
-      toCurrency,
+      fromCurrency: fromCurrency,
+      toCurrency: toCurrency,
     },
     mode: 'onChange',
   });
@@ -64,12 +66,11 @@ const ConvertForm: React.FC = () => {
     setValue('toCurrency', fromCurrency, {
       shouldDirty: true,
     });
-    setConvertFormValues((prev) => ({
-      ...prev,
-      fromCurrency: toCurrency,
+    setConvertValues({
       toCurrency: fromCurrency,
-    }));
-  }, [setValue, setConvertFormValues, toCurrency, fromCurrency]);
+      fromCurrency: toCurrency,
+    });
+  }, [setValue, setConvertValues, toCurrency, fromCurrency]);
 
   const onSubmit = React.useCallback(() => {
     triggerExchangeRate();
@@ -104,7 +105,7 @@ const ConvertForm: React.FC = () => {
               validate: {
                 positive: (amount: number) => {
                   if (amount > 0) {
-                    setConvertFormValues((prev) => ({ ...prev, amount }));
+                    setConvertValues({ amount });
                     return true;
                   }
 
@@ -125,11 +126,11 @@ const ConvertForm: React.FC = () => {
                 <Autocomplete
                   onChange={(event, fromCurrency) => {
                     onChange(fromCurrency);
-                    setConvertFormValues((prev) => ({ ...prev, fromCurrency }));
+                    setConvertValues({ fromCurrency });
                   }}
                   fullWidth
                   value={value}
-                  options={currenciesOptions}
+                  options={currenciesList}
                   disableClearable
                   isOptionEqualToValue={(option, value) =>
                     option.code === value.code
@@ -157,10 +158,10 @@ const ConvertForm: React.FC = () => {
                   fullWidth
                   onChange={(event, toCurrency) => {
                     onChange(toCurrency);
-                    setConvertFormValues((prev) => ({ ...prev, toCurrency }));
+                    setConvertValues({ toCurrency });
                   }}
                   value={value}
-                  options={currenciesOptions}
+                  options={currenciesList}
                   isOptionEqualToValue={(option, value) =>
                     option.code === value.code
                   }
@@ -183,7 +184,7 @@ const ConvertForm: React.FC = () => {
       </SubmitButton>
     </Form>
   );
-};
+});
 
 const FieldsWrapper = styled.div`
   display: flex;

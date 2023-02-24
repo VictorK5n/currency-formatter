@@ -17,19 +17,6 @@ import styled from 'styled-components';
 import { ROUTES } from 'routes';
 import { metrics } from 'styles/theme';
 
-const pages = [
-  {
-    label: 'Currency list',
-    to: ROUTES.ExchangeListPage,
-    icon: <CreditCardIcon />,
-  },
-  {
-    label: 'Convert',
-    to: ROUTES.ConvertPage,
-    icon: <CurrencyExchangeIcon />,
-  },
-];
-
 const Navbar = React.memo(() => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null,
@@ -42,6 +29,19 @@ const Navbar = React.memo(() => {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+
+  const pages = [
+    {
+      label: 'Currency list',
+      to: ROUTES.ExchangeListPage,
+      icon: <CreditCardIcon />,
+    },
+    {
+      label: 'Convert',
+      to: ROUTES.ConvertPage,
+      icon: <CurrencyExchangeIcon />,
+    },
+  ];
 
   return (
     <AppBar position="static">

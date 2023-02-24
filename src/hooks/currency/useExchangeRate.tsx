@@ -19,7 +19,7 @@ export const useExchangeRate = ({
   enabled = false,
   useAsLazy = false,
 }: {
-  baseCurrency: string;
+  baseCurrency?: string;
   enabled?: boolean;
   useAsLazy?: boolean;
 }) => {
@@ -34,8 +34,6 @@ export const useExchangeRate = ({
         const { exchangeInfo, lastUpdatedAt } = await currencyApiClient.latest({
           baseCurrency,
         });
-
-        console.log('[useExchangeRate]');
 
         return queryClient.setQueryData<ExchangeRateInfoType>(
           QUERY_TYPES.ExchangeRate,
@@ -71,8 +69,8 @@ export const useExchangeRate = ({
         onSettled() {
           setIsQueryEnabled(false);
         },
-        // cacheTime: 1000 * 60, // 1 min
-        // refetchInterval: 1000 * 5, // 5 sec
+        cacheTime: 1000 * 60, // 1 min
+        refetchInterval: 1000 * 5, // 5 sec
       },
     );
 

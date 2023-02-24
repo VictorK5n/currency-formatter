@@ -7,20 +7,27 @@ import {
   FormControl,
   TextField,
 } from '@mui/material';
+import { observer } from 'mobx-react-lite';
 import styled from 'styled-components';
 
-import { useExchangeRate, useGlobalContext } from 'hooks';
+import { useExchangeRate } from 'hooks';
 import { CurrencyType } from 'shared/api';
+import { useCurrenciesStore, useExchangeListStore } from 'shared/context';
 import { metrics } from 'styles/theme';
 
 export type CurrencyListFormValues = {
-  baseCurrency: CurrencyType;
-  currenciesList: CurrencyType[];
+  activeBaseCurrency: CurrencyType;
+  activeCurrencies: CurrencyType[];
 };
 
-const CurrencyListForm: React.FC = () => {
-  const { currenciesOptions, currecyListFormValues } = useGlobalContext();
-  const { setCurrecyListFormValues } = useGlobalContext();
+const CurrencyListForm: React.FC = observer(() => {
+  const {
+    baseCurrency,
+    activeCurrenciesList,
+    setBaseCurrency,
+    setActiveCurrenciesList,
+  } = useExchangeListStore();
+  const { currenciesList } = useCurrenciesStore();
 
   const {
     control,
@@ -30,20 +37,25 @@ const CurrencyListForm: React.FC = () => {
     getValues,
     handleSubmit,
   } = useForm<CurrencyListFormValues>({
-    defaultValues: currecyListFormValues,
+    defaultValues: {
+      activeBaseCurrency: baseCurrency!,
+      activeCurrencies: activeCurrenciesList,
+    },
     mode: 'onChange',
   });
 
-  const { baseCurrency, currenciesList } = watch();
+  const { activeBaseCurrency, activeCurrencies } = watch();
 
   const { triggerExchangeRate, isExchageRateLoading, exchangeRate } =
     useExchangeRate({
-      baseCurrency: baseCurrency?.code,
-      enabled: currenciesList.length > 0,
+      baseCurrency: activeBaseCurrency?.code,
+      enabled: activeCurrencies.length > 0,
     });
 
   const shouldUpdate =
-    currenciesList.length && !exchangeRate?.[baseCurrency.code] && isDirty;
+    activeCurrencies.length &&
+    !exchangeRate?.[activeBaseCurrency.code] &&
+    isDirty;
 
   const onSubmit = React.useCallback(() => {
     triggerExchangeRate();
@@ -59,7 +71,7 @@ const CurrencyListForm: React.FC = () => {
     if (shouldUpdate) {
       onSubmit();
     }
-  }, [shouldUpdate, onSubmit, setCurrecyListFormValues, getValues]);
+  }, [shouldUpdate, onSubmit, getValues]);
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -68,19 +80,16 @@ const CurrencyListForm: React.FC = () => {
           <FormControl fullWidth>
             <Controller
               control={control}
-              name="baseCurrency"
+              name="activeBaseCurrency"
               render={({ field: { value, onChange } }) => (
                 <Autocomplete
                   fullWidth
                   onChange={(event, options) => {
                     onChange(options);
-                    setCurrecyListFormValues((prev) => ({
-                      ...prev,
-                      baseCurrency: options,
-                    }));
+                    setBaseCurrency(options);
                   }}
                   value={value}
-                  options={currenciesOptions}
+                  options={currenciesList}
                   disableClearable
                   isOptionEqualToValue={(option, value) =>
                     option.code === value.code
@@ -98,19 +107,16 @@ const CurrencyListForm: React.FC = () => {
           <FormControl fullWidth>
             <Controller
               control={control}
-              name="currenciesList"
+              name="activeCurrencies"
               render={({ field: { value, onChange } }) => (
                 <Autocomplete
                   fullWidth
                   onChange={(event, options) => {
                     onChange(options);
-                    setCurrecyListFormValues((prev) => ({
-                      ...prev,
-                      currenciesList: options,
-                    }));
+                    setActiveCurrenciesList(options);
                   }}
                   value={value}
-                  options={currenciesOptions}
+                  options={currenciesList}
                   isOptionEqualToValue={(option, value) =>
                     option.code === value.code
                   }
@@ -132,7 +138,7 @@ const CurrencyListForm: React.FC = () => {
       </FieldsWrapper>
     </Form>
   );
-};
+});
 
 const Form = styled.form`
   display: flex;

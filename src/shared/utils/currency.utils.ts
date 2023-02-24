@@ -46,8 +46,8 @@ export const getConvertedCurrenciesInfo = ({
   currentExchangeInfo,
 }: {
   amount: number;
-  fromCurrency: CurrencyType;
-  toCurrency: CurrencyType;
+  fromCurrency?: CurrencyType;
+  toCurrency?: CurrencyType;
   lastUpdatedAt?: string;
   currentExchangeInfo?: ExchangeRateResponseType[];
 }) => {
@@ -55,7 +55,7 @@ export const getConvertedCurrenciesInfo = ({
     (c) => c.code === toCurrency?.code,
   )?.value;
 
-  if (!exchangeRate || !lastUpdatedAt) {
+  if (!exchangeRate || !lastUpdatedAt || !fromCurrency || !toCurrency) {
     return;
   }
 
